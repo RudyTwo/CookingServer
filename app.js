@@ -17,20 +17,18 @@ mongoose
 const db = mongoose.connection;
 //Open the database
 db.on("close", (err) => console.log(err));
+db.once("open", () => console.log("Connected to Database"));
+//The collection of Recipes from the database
+const recipeCollection = db.collection("Recipes");
 
 app.get("/Recipes", (req, res) => {
-	db.on("open", function () {
-		console.log("Connected to Database");
-		const recipeCollection = db.collection("Recipes");
-
-		recipeCollection
-			.find()
-			.toArray()
-			.then((allRecipes) => {
-				res.send(allRecipes);
-			})
-			.catch((err) => console.log(err));
-	});
+	recipeCollection
+		.find()
+		.toArray()
+		.then((allRecipes) => {
+			res.send(allRecipes);
+		})
+		.catch((err) => console.log(err));
 });
 
 app.listen(port, () => {
