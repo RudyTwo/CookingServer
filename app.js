@@ -2,34 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const port = 3000;
+const db = require("./database");
 
-//Connect to database
-mongoose
-	.connect(
-		"mongodb+srv://Websites:Wrestling@rudycluster.sm08c.azure.mongodb.net/RudyWebsites?retryWrites=true&w=majority",
-		{
-			useNewUrlParser: true,
-			useFindAndModify: false,
-			useUnifiedTopology: true,
-		}
-	)
-	.catch((err) => console.log(err));
-const db = mongoose.connection;
-//Open the database
-db.on("close", (err) => console.log(err));
-db.once("open", () => console.log("Connected to Database"));
-//Create a schema for the Recipes Collection
-const recipeSchema = new mongoose.Schema({
-	name: String,
-	description: String,
-	instructions: String,
-	image: String,
-	ingredients: Array,
-});
-const recipeModel = mongoose.model("Recipe", recipeSchema, "Recipes");
+//Connect to MongoDB Atlas RudyWebsites.Recipes Database and Collection
+db.connectToMongoDB();
 
+//Get All Recipes
 app.get("/Recipes", (req, res) => {
-	recipeModel
+	db.recipeModel
 		.find({})
 		.then((allRecipes) => {
 			res.send(allRecipes);
@@ -37,8 +17,9 @@ app.get("/Recipes", (req, res) => {
 		.catch((err) => console.log(err));
 });
 
+//Get Single Recipe by ID
 app.get("/Recipe/:id", (req, res) => {
-	recipeModel
+	db.recipeModel
 		.findById(req.params.id)
 		.then((Recipe) => {
 			//If the recipe with the id passed in isn't found then send a 404 error to the browser with a custom message
@@ -57,6 +38,7 @@ app.get("/Recipe/:id", (req, res) => {
 		});
 });
 
+//Creates the actual server and listens on the port set above
 app.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
 });
