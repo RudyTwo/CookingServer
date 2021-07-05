@@ -18,13 +18,19 @@ const db = mongoose.connection;
 //Open the database
 db.on("close", (err) => console.log(err));
 db.once("open", () => console.log("Connected to Database"));
-//The collection of Recipes from the database
-const recipeCollection = db.collection("Recipes");
+//Create a schema for the Recipes Collection
+const recipeSchema = new mongoose.Schema({
+	name: String,
+	description: String,
+	instructions: String,
+	image: String,
+	ingredients: Array,
+});
+const recipeModel = mongoose.model("Recipe", recipeSchema, "Recipes");
 
 app.get("/Recipes", (req, res) => {
-	recipeCollection
-		.find()
-		.toArray()
+	recipeModel
+		.find({})
 		.then((allRecipes) => {
 			res.send(allRecipes);
 		})
@@ -32,9 +38,8 @@ app.get("/Recipes", (req, res) => {
 });
 
 app.get("/Recipe/:id", (req, res) => {
-	recipeCollection
-		//.findOne(req.params.id)
-		.findOne({ _id: req.params.id })
+	recipeModel
+		.findById(req.params.id)
 		.then((Recipe) => {
 			//If the recipe with the id passed in isn't found then send a 404 error to the browser with a custom message
 			if (!Recipe) {
