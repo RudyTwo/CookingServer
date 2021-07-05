@@ -31,6 +31,27 @@ app.get("/Recipes", (req, res) => {
 		.catch((err) => console.log(err));
 });
 
+app.get("/Recipe/:id", (req, res) => {
+	recipeCollection
+		//.findOne(req.params.id)
+		.findOne({ _id: req.params.id })
+		.then((Recipe) => {
+			//If the recipe with the id passed in isn't found then send a 404 error to the browser with a custom message
+			if (!Recipe) {
+				return res.status(404).send({
+					message: "No Recipe could be found with id: " + req.params.id,
+				});
+			}
+			//return the recipe
+			return res.send(Recipe);
+		})
+		.catch((err) => {
+			res.status(500).send({
+				message: "Error while trying to find recipe." + err.message,
+			});
+		});
+});
+
 app.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
 });
