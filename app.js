@@ -4,6 +4,9 @@ const app = express();
 const port = 3000;
 const db = require("./database");
 
+//Parse the request if it is of type json
+app.use(express.json());
+
 //Connect to MongoDB Atlas RudyWebsites.Recipes Database and Collection
 db.connectToMongoDB();
 
@@ -36,6 +39,19 @@ app.get("/Recipe/:id", (req, res) => {
 				message: "Error while trying to find recipe." + err.message,
 			});
 		});
+});
+
+//Create a new Recipe
+app.post("/Recipe", (req, res) => {
+	db.recipeModel.create(req.body, (err, Recipe) => {
+		if (err) {
+			res.status(500).send({
+				message: "Error saving the Recipe. " + err,
+			});
+		}
+		//return the recipe that was just saved
+		res.send(Recipe);
+	});
 });
 
 //Creates the actual server and listens on the port set above
