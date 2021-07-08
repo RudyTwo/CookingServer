@@ -54,6 +54,39 @@ app.post("/Recipe", (req, res) => {
 	});
 });
 
+//Delete a Recipe
+app.delete("/Recipe/:id", (req, res) => {
+	db.recipeModel.findByIdAndDelete(req.params.id, (err, Recipe) => {
+		if (err) {
+			res.status(500).send({
+				message: "Error Deleting Recipe. " + err,
+			});
+		}
+		//return the deleted Recipe
+		res.send(Recipe);
+	});
+});
+
+//Update a Recipe
+app.patch("/Recipe/:id", (req, res) => {
+	db.recipeModel.findByIdAndUpdate(
+		req.params.id,
+		req.body, //The body can contain as many or as few fields as desired.  Only the included fields will be updated all others will contain same values as before the update
+		{
+			new: true, //Returns the updated Recipe instead of original before update
+		},
+		(err, Recipe) => {
+			if (err) {
+				res.status(500).send({
+					message: "Error updating the recipe." + err,
+				});
+			}
+			//return the updated Recipe
+			res.send(Recipe);
+		}
+	);
+});
+
 //Creates the actual server and listens on the port set above
 app.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
